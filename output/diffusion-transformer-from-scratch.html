@@ -12,7 +12,7 @@
 <meta name="keywords" content="models, research, Technical, " />
 
 <meta property="og:title" content="Diffusion Transformer from scratch "/>
-<meta property="og:url" content="https://NLTuan.github.io/blog/diffusion-transformer-from-scratch.html" />
+<meta property="og:url" content="https://NLTuan.github.io/diffusion-transformer-from-scratch.html" />
 <meta property="og:description" content="Custom implementation of Diffusion Transformer from scratch" />
 <meta property="og:site_name" content="tony&#39;s blog" />
 <meta property="og:article:author" content="Le Tuan Huy (Tony) Nguyen" />
@@ -23,10 +23,10 @@
         <title>Diffusion Transformer from scratch  · tony&#39;s blog
 </title>
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="https://NLTuan.github.io/blog/theme/css/elegant.prod.css" media="screen">
-        <link rel="stylesheet" type="text/css" href="https://NLTuan.github.io/blog/theme/css/custom.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="https://NLTuan.github.io/theme/css/elegant.prod.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="https://NLTuan.github.io/theme/css/custom.css" media="screen">
 
-        <link href="https://NLTuan.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="tony&#39;s blog - Full Atom Feed" />
+        <link href="https://NLTuan.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="tony&#39;s blog - Full Atom Feed" />
 
 
     </head>
@@ -40,19 +40,19 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </a>
-                        <a class="brand" href="https://NLTuan.github.io/blog/"><span class=site-name>tony's blog</span></a>
+                        <a class="brand" href="https://NLTuan.github.io/"><span class=site-name>tony's blog</span></a>
                         <div class="nav-collapse collapse">
                             <ul class="nav pull-right top-menu">
                                 <li >
                                     <a href=
-                                       https://NLTuan.github.io/blog
+                                       https://NLTuan.github.io
                                     >Home</a>
                                 </li>
-                                <li ><a href="https://NLTuan.github.io/blog/pages/about-me.html">About Me</a></li>
-                                <li ><a href="https://NLTuan.github.io/blog/categories.html">Categories</a></li>
-                                <li ><a href="https://NLTuan.github.io/blog/tags.html">Tags</a></li>
-                                <li ><a href="https://NLTuan.github.io/blog/archives.html">Archives</a></li>
-                                <li><form class="navbar-search" action="https://NLTuan.github.io/blog/search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                                <li ><a href="https://NLTuan.github.io/pages/about-me.html">About Me</a></li>
+                                <li ><a href="https://NLTuan.github.io/categories.html">Categories</a></li>
+                                <li ><a href="https://NLTuan.github.io/tags.html">Tags</a></li>
+                                <li ><a href="https://NLTuan.github.io/archives.html">Archives</a></li>
+                                <li><form class="navbar-search" action="https://NLTuan.github.io/search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
                             </ul>
                         </div>
                     </div>
@@ -66,7 +66,7 @@
 <div class="row-fluid">
     <header class="page-header span10 offset2">
         <h1>
-            <a href="https://NLTuan.github.io/blog/diffusion-transformer-from-scratch.html">
+            <a href="https://NLTuan.github.io/diffusion-transformer-from-scratch.html">
                 Diffusion Transformer from scratch
             </a>
         </h1>
@@ -77,8 +77,7 @@
         <div class="span8 offset2 article-content">
             
             <h1>Diffusion Transformer from scratch</h1>
-<p>In my journey of understanding the state of the art in end to end robotic policy training, I found a very very common paradigm that
-a lot of research labs have converted to which is to pivot towards diffusion-based models to model action chunks for robots to perform(DIFFUSION POLICY REF, PI 0 REF). Many of you reading are probably familiar with diffusion models in the context of image generation, and robot training policies are merely borrowing these same architectures. Initially, diffusion models were CNN based, but with the rise of transformers, they have found their way to sneak in as well: Enter the Diffusion Transformer. I have bestowed upon myself the task of reimplementing the paper that has introduced this architecture: Scalable Diffusion Models with Transformers (REF FOR DIFFUSION TRANSFORMER). In this paper, they showed that Diffusion Transformers had scalability properties and outperformed all prior diffusion models. For this implementation, I will be staying within the image generation space. (Pi 0 implementation coming soon!)</p>
+<p>In my journey of understanding the state of the art in end to end robotic policy training, I found a very very common paradigm that a lot of research labs have converted to which is to pivot towards diffusion-based models to model action chunks for robots to perform(DIFFUSION POLICY REF, PI 0 REF). Many of you reading are probably familiar with diffusion models in the context of image generation, and robot training policies are merely borrowing these same architectures. Initially, diffusion models were CNN based, but with the rise of transformers, they have found their way to sneak in as well: Enter the Diffusion Transformer. I have bestowed upon myself the task of reimplementing the paper that has introduced this architecture: Scalable Diffusion Models with Transformers (REF FOR DIFFUSION TRANSFORMER). In this paper, they showed that Diffusion Transformers had scalability properties and outperformed all prior diffusion models. For this implementation, I will be staying within the image generation space. (Pi 0 implementation coming soon!)</p>
 <p>The implementation of Diffusion Transformer will be split into it's constituent parts as Pytorch modules and then assembled as one DiT module. The parts consist of: Patchify, Conditionning Embeddings, DiT Block with adaLN-Zero, and output projection layers.</p>
 <p>However, the paper does not include the VAE that compresses the original image into a latent representation and instead opts into using a frozen pretrained VAE. This VAE allows the Diffusion Transformer to work in a smaller dimension, which reduces computational costs and makes training efficient.</p>
 <h1>Patchify</h1>
@@ -89,8 +88,14 @@ a lot of research labs have converted to which is to pivot towards diffusion-bas
 * Timesteps: ( Apologies in advance for the my attempt at explaining this in English :( ) They are embedded differently than categorical data types that simply index into a table. Timesteps in this case can be fractional and a different method is used. A variant of sine-cosine embedding is used. Key differences include the timesteps being multiplied to the arguments of the sine and cosine and that the sines and cosines aren't weaved one after and are instead concatenated along the hidden dimension. Also, this sine-cosine layer operated at a different dimension than the embedding dimension of the model, and a projection layer is applied at the end to return to the model dimension. In a sense, it is a combination of sin-cos embeddings and learned embeddings.</p>
 <h1>DiT Block</h1>
 <p>The DiT block is architecturally identical to the standard Transformer block, with the exception of the conditioning mechanism. I will not dive deep into the attention and the feedforward network as there are a multitude of guides out there already that explains them in depth with competence. Seriously, the transformer can be it's own blog post series and I will leave that as an exercise to the reader ;-). In addition to the regular transformer, there are conditionning layers that allow us to inject the timestep and label embeddings that we previously created into the transformer block, steering the output to be conditionned by the timestep and label. The technique used is adaptive layernorm (adaLN) with zero initialization (makes it adaLN-Zero). The condition embeddings are projected into a dimention of 6 * dim and then chunked into 6 variables gamma_1, gamma_2, beta_1, beta_2, alpha_1, alpha_2. These variables are then used to scale and shift the output of the transformer block. The scale-shift with gamma being the scalar and beta being the shift happens before every Multi-Head Attention and FeedForward operation. Another scale operation with alpha is applied after the self-attention and feedforward operations. The zero part in adaLN-Zero comes from the zeroing of the projection MLP weights (the 6 * dim projection one). The adaLN-Zero method is the chosen by the authors over cross-attention and simply concatenating the embeddings since they have found it to work best in terms of performance in FID score and compute-efficiency. </p>
-<h1>Output Projection</h1>
+<h1>Output Projection and Unpatchify</h1>
+<p>This part is responsible for converting the transformer outputs back into the image shape. A final layer applies a projection from the hidden size to  <code>patch_size * patchsize * out_channels</code> which gets transformed into <code>(B, C, H, W)</code> in the unpatchify layer. With the final output, it is then possible to compute the loss as it is the same shape as the initial image.</p>
 <h1>Putting it all together</h1>
+<p>Chaining all of these components together yields the Diffusion Transformer! It accepts in an image/latent and produces a noise prediction (or a velocity field if you using a flow matching objective).</p>
+<h1>Training &amp; sampling</h1>
+<p>I think the training and especially sampling deserves it's own blog post because of it's high-ish complexity (or my lack of clarity!). Stay tuned for DDPM/DDIM vs Flow Matching.</p>
+<h1>Conclusion</h1>
+<p>I have learned a lot from trying to implement this architecture from scratch. Embedding the inputs and conditionning were things I have not worked on before coming from an LLM background. Otherwise I am surprised at how many similarities there are between this and the CNN diffusion model in terms of training and architectural similarities with LLMs (Transformers supremacy).</p>
 <h1>References</h1>
 
 
@@ -111,13 +116,13 @@ a lot of research labs have converted to which is to pivot towards diffusion-bas
             <h4>Published</h4>
             <time itemprop="dateCreated" datetime="2026-04-21T00:00:00-04:00">Apr 21, 2026</time>
             <h4>Category</h4>
-            <a class="category-link" href="https://NLTuan.github.io/blog/categories.html#technical-ref">Technical</a>
+            <a class="category-link" href="https://NLTuan.github.io/categories.html#technical-ref">Technical</a>
             <h4>Tags</h4>
             <ul class="list-of-tags tags-in-article">
-                <li><a href="https://NLTuan.github.io/blog/tags.html#models-ref">models
+                <li><a href="https://NLTuan.github.io/tags.html#models-ref">models
                     <span>1</span>
 </a></li>
-                <li><a href="https://NLTuan.github.io/blog/tags.html#research-ref">research
+                <li><a href="https://NLTuan.github.io/tags.html#research-ref">research
                     <span>2</span>
 </a></li>
             </ul>

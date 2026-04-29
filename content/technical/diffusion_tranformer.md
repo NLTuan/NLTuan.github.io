@@ -40,10 +40,14 @@ This part is responsible for converting the transformer outputs back into the im
 Chaining all of these components together yields the Diffusion Transformer! It accepts an image/latent and produces a noise prediction (or a velocity field if you're using a flow matching objective).
 
 # Training & Sampling
-I think the training and especially sampling deserves its own blog post because of its high complexity (or my lack of clarity!). Stay tuned for DDPM/DDIM vs Flow Matching. However, I was able to produce quite meaningful results training on MNIST and CIFAR10. MNIST is the GIF at the beginning of the blog post and a ~6.5 million parameter model was trained for 6 epochs. 
+I think the training and especially sampling deserves its own blog post because of its high complexity (or my lack of clarity!). Stay tuned for DDPM/DDIM vs Flow Matching. However, I was able to produce quite meaningful results training on MNIST and CIFAR-10. MNIST is the GIF at the beginning of the blog post and a ~6.5 million parameter model was trained for 10 epochs and the results looked great. I trained Diffusion Transformer with flow matching with the same model on CIFAR-10 for 20 epochs and the results were... stellar.
+
+<img src="../images/diffusion_transformer/denoising_20_cifar.gif" alt="Demo GIF" width="500" style="max-width: 100%; height: auto;">
+
+Maybe needs some hyperparameter tuning.
 
 # Conclusion
-I have learned a lot from trying to implement this architecture from scratch. Embedding the inputs and conditioning were things I have not worked on before coming from an LLM background. Otherwise, I am surprised at how many similarities there are between this and the CNN diffusion model in terms of training and architectural similarities with LLMs.
+I have learned a lot from trying to implement this architecture from scratch. Embedding the inputs and conditioning were things I have not worked on before coming from an LLM background. Otherwise, I am surprised at how many similarities there are between this and the CNN diffusion model in terms of training and architectural similarities with LLMs. 
 
 # References
 

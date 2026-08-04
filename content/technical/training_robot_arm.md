@@ -31,7 +31,7 @@ The resulting model exceeded our initial expectations: we obtained a capable pol
 
 <figure>
   <video controls playsinline preload="metadata" style="max-width: 100%; height: auto;">
-    <source src="https://github.com/NLTuan/NLTuan.github.io/releases/download/robot-arm-assets/Repeat.successes.cut.mp4" type="video/mp4">
+    <source src="https://github.com/NLTuan/NLTuan.github.io/releases/download/robot-arm-assets/repeat-successes-web.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
   <figcaption>A montage of successful pick-and-place attempts during evaluation.</figcaption>

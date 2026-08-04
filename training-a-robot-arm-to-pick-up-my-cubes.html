@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="english">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="https://NLTuan.github.io/theme/css/elegant.prod.9e9d5ce754.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="https://NLTuan.github.io/theme/css/custom.css" media="screen">
+
+        <link rel="dns-prefetch" href="//fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+
+        <meta name="author" content="VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, [members name to fill]" />
+
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
+
+<meta name="keywords" content="robotics, machine-learning, vision-language-action, lerobot, Technical, " />
+
+<meta property="og:title" content="Training a Robot Arm to Pick Up My Cubes "/>
+<meta property="og:url" content="https://NLTuan.github.io/training-a-robot-arm-to-pick-up-my-cubes.html" />
+<meta property="og:description" content="Notes and lessons from training a robot arm, covering the setup, data collection process, policy training loop, evaluation, and the practical lessons learned while moving from model code to real robot behavior." />
+<meta property="og:site_name" content="tony&#39;s blog" />
+<meta property="og:article:author" content="VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, [members name to fill]" />
+<meta property="og:article:published_time" content="2026-06-29T00:00:00-04:00" />
+<meta name="twitter:title" content="Training a Robot Arm to Pick Up My Cubes ">
+<meta name="twitter:description" content="Notes and lessons from training a robot arm, covering the setup, data collection process, policy training loop, evaluation, and the practical lessons learned while moving from model code to real robot behavior.">
+
+        <title>Training a Robot Arm to Pick Up My Cubes  · tony&#39;s blog
+</title>
+        <link href="https://NLTuan.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="tony&#39;s blog - Full Atom Feed" />
+
+
+
+    </head>
+    <body>
+        <div id="content">
+            <div class="navbar navbar-static-top">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+                        <a class="brand" href="https://NLTuan.github.io/"><span class=site-name>tony's blog</span></a>
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right top-menu">
+                                <li >
+                                    <a href=
+                                       https://NLTuan.github.io
+                                    >Home</a>
+                                </li>
+                                <li ><a href="https://NLTuan.github.io/pages/about-me.html">About Me</a></li>
+                                <li ><a href="https://NLTuan.github.io/categories.html">Categories</a></li>
+                                <li ><a href="https://NLTuan.github.io/tags.html">Tags</a></li>
+                                <li ><a href="https://NLTuan.github.io/archives.html">Archives</a></li>
+                                <li><form class="navbar-search" action="https://NLTuan.github.io/search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span1"></div>
+                    <div class="span10">
+<article itemscope>
+<div class="row-fluid">
+    <header class="page-header span10 offset2">
+        <h1>
+            <a href="https://NLTuan.github.io/training-a-robot-arm-to-pick-up-my-cubes.html">
+                Training a Robot Arm to Pick Up My Cubes
+            </a>
+        </h1>
+    </header>
+</div>
+
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+            
+            <h1>Training a Robot Arm to Pick Up My Cubes</h1>
+<p>In recent years, there have been rapid advances in robotic policies, with hundreds of papers published on Vision-Language-Action (VLA) models and World-Action Models (WAMs). These models have demonstrated remarkable dexterity and generalization capabilities in both simulation and real-world embodiments.</p>
+<p>At VRAI Lab, we wanted to find out what it would be like to train our own policies on our own datasets using our own real robots. A few years ago, this would have been out of reach for a small team with a small budget because of the cost of hardware and compute. Thanks to the work of the research and open-source communities, the barrier to entry has fallen. Robotic arms can cost as little as CAD 400, open-source libraries facilitate model training and evaluation, and capable models are now accessible to smaller teams.</p>
+<p>As a first step, we trained and deployed ACT on an SO-101 robotic arm. We chose a task in which the arm reaches for and grasps a block from an arbitrary starting position, then places it within a defined boundary. Although simple, the task demonstrates the model's ability to complete a real-world task: recognize the block, reach for it, place it in the correct location, and finish gracefully.</p>
+<p>We are impressed by the model's performance and are now working to improve its task diversity and generalization, language understanding, and capabilities through a bimanual embodiment.</p>
+<h1>Robot hardware</h1>
+<p>The robot is an <a href="https://huggingface.co/docs/lerobot/so101">SO-101</a>, an affordable CAD 400 robot arm with a gripper and six degrees of freedom (DoF). We chose it because it was affordable, easy to set up, and well supported by the open-source community. Details about the robot parts and 3D-printed components are documented in <a href="https://github.com/TheRobotStudio/SO-ARM100">its repository</a>. Using the robot is mostly smooth sailing; most issues stem from USB-port management for the servo controllers and from cameras randomly disconnecting or changing device assignments. Our single-arm camera setup consists of one wrist view and one top view. Careful camera placement is important: the task must be solvable from the camera views alone, as those are the inputs available to the robot during inference.</p>
+<h1>Task Selection and Data Collection</h1>
+<p>The chosen task is simple: pick up a red block and place it within an area delimited by red tape. It serves as an introductory exercise in robot imitation learning while requiring the robot to use vision from multiple camera views and some dexterity to complete the task. The short trajectories also make it relatively easy to record. We recorded data using the LeRobot platform, which makes it straightforward to capture demonstrations with leader and follower arms. With this setup, we recorded more than 75 episodes in an hour, with each episode taking 25–30 seconds. We aim for at least 120 episodes per dataset.</p>
+<h1>Policy training (ACT)</h1>
+<p>We also trained the policy with the LeRobot framework. It supports many architectures, including the lightweight <a href="https://arxiv.org/abs/2304.13705">Action Chunking Transformer (ACT)</a>. With 53 million parameters, ACT trains quickly and lets us iterate on hyperparameters efficiently. Training for approximately 1.5 hours on two free Kaggle T4 GPUs produced a policy capable of performing the pick-and-place task. Checkpoint selection is difficult because evaluation occurs in the real world. Loss alone is not a useful metric: robot data are multimodal, so many different trajectories can complete the same task. Instead, we evaluate checkpoints at regular intervals by running rollouts and tallying successful attempts. This process is currently time-consuming, so we are exploring other evaluation methods.</p>
+<h1>Results</h1>
+<p>The resulting model exceeded our initial expectations: we obtained a capable policy with little training and tuning, suggesting that ACT is robust for this task. In particular, once the arm grasps the cube, it reliably completes the placement. ACT generates a new action chunk at every time step, making it responsive to changing conditions and well suited to quick error recovery.</p>
+<figure>
+  <video controls playsinline preload="metadata" style="max-width: 100%; height: auto;">
+    <source src="https://github.com/NLTuan/NLTuan.github.io/releases/download/robot-arm-assets/Repeat.successes.cut.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <figcaption>A montage of successful pick-and-place attempts during evaluation.</figcaption>
+</figure>
+
+<p>Of course, the model still has limitations. First, because ACT uses action-chunk ensembling, we had to tune the ensembling factor to obtain smoother movement. Second, the model struggles to complete the task on consecutive attempts. We suspect that ensembling contributes to this issue, as older action chunks can influence later chunks. Third, there are "dead zones" in which the policy cannot complete the task and becomes stuck. More diverse data may address this limitation. Finally, ACT retains a deterministic loss component despite using a CVAE to account for multimodality. We will discuss this further in future work.</p>
+<h1>Future work</h1>
+<p>Our success on this simple task is only a starting point for more capable robotics work. We plan to expand the robot's capabilities with a bimanual setup that can unlock more diverse tasks, such as folding clothes or inserting batteries. We also want to explore multitask vision-language-action settings, where a generalist policy can be prompted to perform a task rather than trained from scratch for a single task, as in our experiment. Finally, the field has shifted towards diffusion- and flow-matching-based approaches to capture the multimodality of robotic data. To address the latter two directions, we are currently fine-tuning SmolVLA, a lightweight 400-million-parameter flow-matching model pretrained on diverse SO-101 robot data.</p>
+
+
+             
+ 
+            
+            
+            
+
+
+
+
+
+
+
+            <hr/>
+        </div>
+        <section id="article-sidebar" class="span2">
+            <h4>Published</h4>
+            <time itemprop="dateCreated" datetime="2026-06-29T00:00:00-04:00">Mon 29 June 2026</time>
+            <h4>Category</h4>
+            <a class="category-link" href="https://NLTuan.github.io/categories.html#technical-ref">Technical</a>
+            <h4>Tags</h4>
+            <ul class="list-of-tags tags-in-article">
+                <li><a href="https://NLTuan.github.io/tags.html#lerobot-ref">lerobot
+                    <span class="superscript">1</span>
+</a></li>
+                <li><a href="https://NLTuan.github.io/tags.html#machine-learning-ref">machine-learning
+                    <span class="superscript">1</span>
+</a></li>
+                <li><a href="https://NLTuan.github.io/tags.html#robotics-ref">robotics
+                    <span class="superscript">1</span>
+</a></li>
+                <li><a href="https://NLTuan.github.io/tags.html#vision-language-action-ref">vision-language-action
+                    <span class="superscript">1</span>
+</a></li>
+            </ul>
+<h4>Contact</h4>
+<div id="sidebar-social-link">
+</div>
+            
+
+
+
+
+
+            
+
+
+
+
+
+        </section>
+</div>
+</article>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>                    </div>
+                    <div class="span1"></div>
+                </div>
+            </div>
+        </div>
+<footer>
+
+
+
+
+    <div id="fpowered">
+        Powered by: <a href="http://getpelican.com/" title="Pelican Home Page" target="_blank" rel="nofollow noopener noreferrer">Pelican</a>
+        Theme: <a href="https://elegant.oncrashreboot.com/" title="Theme Elegant Home Page" target="_blank" rel="nofollow noopener noreferrer">Elegant</a>
+    </div>
+</footer>            <script src="//code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script src="https://NLTuan.github.io/theme/js/elegant.prod.9e9d5ce754.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+
+    <script>
+    (function () {
+        if (window.location.hash.match(/^#comment-\d+$/)) {
+            $('#comment_thread').collapse('show');
+        }
+    })();
+    window.onhashchange=function(){
+        if (window.location.hash.match(/^#comment-\d+$/))
+            window.location.reload(true);
+    }
+    $('#comment_thread').on('shown', function () {
+        var link = document.getElementById('comment-accordion-toggle');
+        var old_innerHTML = link.innerHTML;
+        $(link).fadeOut(200, function() {
+            $(this).text('Click here to hide comments').fadeIn(200);
+        });
+        $('#comment_thread').on('hidden', function () {
+            $(link).fadeOut(200, function() {
+                $(this).text(old_innerHTML).fadeIn(200);
+            });
+        })
+    })
+</script>
+
+    </body>
+    <!-- Theme: Elegant built for Pelican
+        License : MIT -->
+</html>

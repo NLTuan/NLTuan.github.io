@@ -9,7 +9,7 @@ Summary: Custom implementation of Diffusion Transformer from scratch
 
 In my journey of understanding the state of the art in end to end robotic policy training, I found a very very common paradigm that a lot of research labs have converted to which is to pivot towards diffusion-based models to model action chunks for robots to perform (1, 2). Many of you reading are probably familiar with diffusion models in the context of image generation, and robot training policies are merely borrowing these same architectures. Initially, diffusion models were CNN based, but with the rise of transformers, they have found their way to sneak in as well: Enter the Diffusion Transformer. I have bestowed upon myself the task of reimplementing the paper that has introduced this architecture: Scalable Diffusion Models with Transformers (4). In this paper, they showed that Diffusion Transformers had scalability properties and outperformed all prior diffusion models. For this implementation, I will be staying within the image generation space. (Pi0 implementation coming soon!)
 
-<img src="../images/diffusion_transformer/denoising_epoch_10.gif" alt="Demo GIF" width="500" style="max-width: 100%; height: auto;">
+<img src="../images/diffusion_transformer/denoising_10_mnist.gif" alt="Demo GIF" width="500" style="max-width: 100%; height: auto;">
 
 The implementation of Diffusion Transformer will be split into its constituent parts as PyTorch modules and then assembled as one DiT module. The parts consist of: Patchify, Conditioning Embeddings, DiT Block with adaLN-Zero, and output projection layers.
 

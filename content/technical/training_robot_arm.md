@@ -7,6 +7,8 @@ Summary: Notes and lessons from training a robot arm, covering the setup, data c
 
 # Training a Robot Arm to Pick Up My Cubes
 
+**Authors:** VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, [members name to fill]
+
 In recent years, there have been rapid advances in robotic policies, with hundreds of papers published on Vision-Language-Action (VLA) models and World-Action Models (WAMs). These models have demonstrated remarkable dexterity and generalization capabilities in both simulation and real-world embodiments.
 
 At VRAI Lab, we wanted to find out what it would be like to train our own policies on our own datasets using our own real robots. A few years ago, this would have been out of reach for a small team with a small budget because of the cost of hardware and compute. Thanks to the work of the research and open-source communities, the barrier to entry has fallen. Robotic arms can cost as little as CAD 400, open-source libraries facilitate model training and evaluation, and capable models are now accessible to smaller teams.

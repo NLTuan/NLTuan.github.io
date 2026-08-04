@@ -27,6 +27,14 @@ We also trained the policy with the LeRobot framework. It supports many architec
 # Results
 The resulting model exceeded our initial expectations: we obtained a capable policy with little training and tuning, suggesting that ACT is robust for this task. In particular, once the arm grasps the cube, it reliably completes the placement. ACT generates a new action chunk at every time step, making it responsive to changing conditions and well suited to quick error recovery.
 
+<figure>
+  <video controls playsinline preload="metadata" style="max-width: 100%; height: auto;">
+    <source src="../images/training_robot_arm/Repeat%20successes%20cut.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <figcaption>A montage of successful pick-and-place attempts during evaluation.</figcaption>
+</figure>
+
 Of course, the model still has limitations. First, because ACT uses action-chunk ensembling, we had to tune the ensembling factor to obtain smoother movement. Second, the model struggles to complete the task on consecutive attempts. We suspect that ensembling contributes to this issue, as older action chunks can influence later chunks. Third, there are "dead zones" in which the policy cannot complete the task and becomes stuck. More diverse data may address this limitation. Finally, ACT retains a deterministic loss component despite using a CVAE to account for multimodality. We will discuss this further in future work.
 
 # Future work

@@ -44,4 +44,4 @@ MENUITEMS = (
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
 
-THEME = "/home/letua/pelican-themes/elegant"
+THEME = "themes/elegant"

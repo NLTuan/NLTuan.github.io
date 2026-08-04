@@ -1,0 +1,9 @@
+[project]
+name = "nltuan-github-io"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "ghp-import>=2.1.0",
+    "markdown>=3.10.3",
+    "pelican>=4.12.0",
+]

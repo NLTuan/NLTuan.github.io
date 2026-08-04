@@ -2,7 +2,7 @@ Title: Training a Robot Arm to Pick up my Cubes
 Date: 2026-06-29
 Category: Technical
 Tags: robotics, machine-learning, vision-language-action, lerobot
-Author: VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, 
+Author: VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, [members name to fill]
 Summary: Notes and lessons from training a robot arm, covering the setup, data collection process, policy training loop, evaluation, and the practical lessons learned while moving from model code to real robot behavior.
 
 # Training a Robot Arm
@@ -13,13 +13,19 @@ At VRAI Lab, we wanted to know what it would be like to train our own policies o
 
 As our first stepping stone, we wanted to train and deploy ACT on a SO-101 robotic arm. The task that we have chosen is reaching and grasping a block with an arbitrary starting position, then placing it within a defined boundary. The reason why we proceeded with this task is for its simplicity, yet it is still demonstrating the model's ability to accomplish a real-life task: recognizing the block, reaching it, placing it in the right spot, finishing gracefully. 
 
-We are impressed at the model's performance, and are now working on improving it in terms of task diversity and generalization, language understanding, and a bimanual embodiment for extra (explained further in Future Work).
+We are impressed at the model's performance, and are now working on improving it in terms of task diversity and generalization, language understanding, and a bimanual embodiment for extra capability.
 
+# Robot hardware
+The robot is a SO-101 robot (https://huggingface.co/docs/lerobot/so101), a cheap 400$ CAD robot arm with a gripper and has 6 DoF. We chose this because it was affordable, easy to set up, and well supported by the open source community. Details for the robot parts and 3D prints are documented in its respective repository (https://github.com/TheRobotStudio/SO-ARM100). Using the robot is mostly smooth sailing, with most of the issues arising from USB port management with the servo controllers and cameras randomly disconnecting and switching. The single arm camera setup consists of 1 wrist view and 1 top view. It is important for the cameras to be well placed; the tasks should be doable through camera views exclusively, as it is what the robot will see during inference.
 
-body WIP
+# Task Selection and Data Collection
+The chosen task is a simple: pick up a red block and place it within an area delimited by red tape. This task was chosen due to its simplicity and serves as an introductory exercise to robot imitation learning. It requires the robot to use vision through different camera views and possess some dexterity to complete the task. It is also quite easy to record because of simplicity and shorter length. We recorded data using the LeRobot platform, they make it extremely easy to record data with a follower and a leader arm. With this we were able to crank out 75+ episodes in the span of an hour, each episode taking 25-30 seconds. We aim for 120 episodes or more per dataset. 
 
-Robot hardware
-Software stack (lerobot)
-Data collection
-Policy training (ACT)
-Future work
+# Policy training (ACT)
+Policy training was also done with the LeRobot framework. It provides easy training with many implemented architectures; the most lightweight of which is Action Chunking Transformer (ACT) from its respective paper (https://arxiv.org/abs/2304.13705). It has 53M parameters which makes training very fast and we can iterate through hyperparameters quickly. Training takes approximately 1.5 hours to train on a free Kaggle GPU (2x T4) to be able to perform the pick and place task. Checkpoint selection is difficult due to the real-life nature of the task. Loss metrics are meaningless because of the multimodality of robot data (many differing ways to perform the same task). We approach checkpoint selection with success rate: checkpoint once every N steps, run rollouts, and tally the number of successes. Currently, this approach is quite time consuming, and we are looking for other means of evaluation. 
+
+# Results
+The resulting model exceeded our initial expectations as it was very easy to obtain a decent model. It was able to do what it was tasked to do with little training and tuning, showing that ACT is very robust. In particular, once it has grasped the cube, it never fails in the putback. ACT generates a new chunk every frame, so it is quite responsive to the environment changing, thus making it good at quick error recovery.  Of course there are still limitations to the model. Firstly, since ACT uses action chunk ensembling, we had to tune the ensembling factor for smoother movement. Secondly, the model struggles with completing the task in consecutive tries (i.e. ). We think that ensembling is at the cause of this, as older action chunks "contaminate" future chunks. Thirdly, there are "dead zones" in which the policy cannot complete the task whatsoever and gets stuck in a limbo. We think that this can be addressed with more data diversity. Lastly, ACT still has a deterministic loss despite having a CVAE to account for multimodality. This will be discussed in future work.
+
+# Future work
+Our successes on this simple task only is the starting point in capable robotics work. We plan on expanding in robot capability by working on a bimanual setting to unlock diverse tasks such as clothes folding or slotting batteries. We also want to explore multitask vision-language domains, where a generalist policy can be prompted to perform any task rather than being trained from scratch to do one task as it was the case with our experiment. Lastly, the field has pivoted towards diffusion or flow matching based approaches to capture the multimodality of robotics data. To address the 2 latter points, we are currently working on finetuning SmolVLA, a lightweight 400M parameter flow matching model that has been pretrained on diverse SO-101 robot data.

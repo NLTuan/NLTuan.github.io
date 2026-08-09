@@ -2,12 +2,13 @@ Title: Training a Robot Arm to Pick Up My Cubes
 Date: 2026-06-29
 Category: Technical
 Tags: robotics, machine-learning, vision-language-action, lerobot
-Author: VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, [members name to fill]
+Author: VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, Dante Aglieri, Jacob Huang, Kim Anh Ton, Laura Tarita, Florian Duquerroix.
+
 Summary: Notes and lessons from training a robot arm, covering the setup, data collection process, policy training loop, evaluation, and the practical lessons learned while moving from model code to real robot behavior.
 
 # Training a Robot Arm to Pick Up My Cubes
 
-**Authors:** VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, [members name to fill]
+**Authors:** VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, Dante Aglieri, Jacob Huang, Kim Anh Ton, Laura Tarita, Florian Duquerroix.
 
 In recent years, there have been rapid advances in robotic policies, with hundreds of papers published on Vision-Language-Action (VLA) models and World-Action Models (WAMs). These models have demonstrated remarkable dexterity and generalization capabilities in both simulation and real-world embodiments.
 

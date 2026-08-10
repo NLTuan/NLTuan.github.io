@@ -10,7 +10,7 @@
         <link rel="dns-prefetch" href="//fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
 
-        <meta name="author" content="VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, Dante Aglieri, Jacob Huang, Kim Anh Ton, Laura Tarita, Florian Duquerroix." />
+        <meta name="author" content="VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, Dante Marcogliese, Jacob Huang, Kim Anh Ton, Laura Tarita, Florian Duquerroix." />
 
         <meta property="og:type" content="article" />
         <meta name="twitter:card" content="summary">
@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://NLTuan.github.io/training-a-robot-arm-to-pick-up-my-cubes.html" />
 <meta property="og:description" content="Summary: Notes and lessons from training a robot arm, covering the setup, data collection process, policy training loop, evaluation, and the practical lessons learned while moving from model code to real robot behavior. Training a Robot Arm to Pick Up My Cubes Authors: VRAI Lab, Le Tuan Huy (Tony) Nguyen …" />
 <meta property="og:site_name" content="tony&#39;s blog" />
-<meta property="og:article:author" content="VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, Dante Aglieri, Jacob Huang, Kim Anh Ton, Laura Tarita, Florian Duquerroix." />
+<meta property="og:article:author" content="VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, Dante Marcogliese, Jacob Huang, Kim Anh Ton, Laura Tarita, Florian Duquerroix." />
 <meta property="og:article:published_time" content="2026-06-29T00:00:00-04:00" />
 <meta name="twitter:title" content="Training a Robot Arm to Pick Up My Cubes ">
 <meta name="twitter:description" content="Summary: Notes and lessons from training a robot arm, covering the setup, data collection process, policy training loop, evaluation, and the practical lessons learned while moving from model code to real robot behavior. Training a Robot Arm to Pick Up My Cubes Authors: VRAI Lab, Le Tuan Huy (Tony) Nguyen …">
@@ -81,7 +81,7 @@
             
             <p>Summary: Notes and lessons from training a robot arm, covering the setup, data collection process, policy training loop, evaluation, and the practical lessons learned while moving from model code to real robot behavior.</p>
 <h1>Training a Robot Arm to Pick Up My Cubes</h1>
-<p><strong>Authors:</strong> VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, Dante Aglieri, Jacob Huang, Kim Anh Ton, Laura Tarita, Florian Duquerroix.</p>
+<p><strong>Authors:</strong> VRAI Lab, Le Tuan Huy (Tony) Nguyen, Thavin Thanabalasingam, Dante Marcogliese, Jacob Huang, Kim Anh Ton, Laura Tarita, Florian Duquerroix.</p>
 <p>In recent years, there have been rapid advances in robotic policies, with hundreds of papers published on Vision-Language-Action (VLA) models and World-Action Models (WAMs). These models have demonstrated remarkable dexterity and generalization capabilities in both simulation and real-world embodiments.</p>
 <p>At VRAI Lab, we wanted to find out what it would be like to train our own policies on our own datasets using our own real robots. A few years ago, this would have been out of reach for a small team with a small budget because of the cost of hardware and compute. Thanks to the work of the research and open-source communities, the barrier to entry has fallen. Robotic arms can cost as little as CAD 400, open-source libraries facilitate model training and evaluation, and capable models are now accessible to smaller teams.</p>
 <p>As a first step, we trained and deployed ACT on an SO-101 robotic arm. We chose a task in which the arm reaches for and grasps a block from an arbitrary starting position, then places it within a defined boundary. Although simple, the task demonstrates the model's ability to complete a real-world task: recognize the block, reach for it, place it in the correct location, and finish gracefully.</p>
